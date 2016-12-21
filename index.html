@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Quoth the Giphy</title>
+
+   <link rel="stylesheet" type="text/css" href="assets/css/reset.css"> -->
+   <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+ -->   
+</head>
+
+   
+<body>
+
+ <div class="container">
+    <h1>Gif Search</h1>
+
+    <!-- buttons view-->
+    <div id="buttons-view">
+     
+    </div>
+
+    <form id="request-form" style="padding-left: 1080px">
+      <label for="request-input">Add a GIF Request</label>
+      <input type="text" id="request-input"><br>
+
+      <!-- Button triggers new Request to be added -->
+      <input id="add-request" type="submit" value="Add a Gif Request">
+    </form>
+
+  </div> 
+
+  <div id="domOutput">
+     <div id="gifs-appear-here">
+      </div> 
+  </div>
+
+  <!-- <div id="gifs-appear-here"> -->
+      <!-- </div> -->
+
+
+  <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+
+  <script type="text/javascript">
+
+  var gifs = [];
+
+  var imagesOut = [];
+
+  function renderButtons() {
+
+        
+        $("#buttons-view").empty();
+
+        
+        for (var i = 0; i < gifs.length; i++) {
+
+          
+          var a = $("<button>");
+          // Adds a class of movie to our button
+          a.addClass("gifclass");
+          // Added a data-attribute
+          a.attr("data-name", gifs[i]);
+          // Provided the initial button text
+          a.text(gifs[i]);
+          // Added the button to the buttons-view div
+          $("#buttons-view").append(a);
+        }
+      }
+
+$("#add-request").on("click", function(event) {
+        event.preventDefault();
+        // This line of code will grab the input from the textbox
+        var request = $("#request-input").val().trim();
+
+        // The movie from the textbox is then added to our array
+        gifs.push(request);
+        $("#request-input").val("");
+        renderButtons ();
+
+      });
+
+
+      $(document).on("click",".gifclass",function() {
+      var person = $(this).data("name");
+      console.log (person)
+      var queryURL = "http://api.giphy.com/v1/gifs/search?q=" +
+        person + "&api_key=dc6zaTOxFJmzC&limit=10";
+
+      $.ajax({
+          url: queryURL,
+          method: "GET"
+        })
+        .done(function(response) {
+          var results = response.data;
+          console.log(response.data)
+          var gifDiv = $("<div class='item'>");
+          for (var i = 0; i < results.length; i++) {
+            var gifDiv = $("<div class='item'>");
+
+            var rating = results[i].rating;
+
+            var p = $("<p>").text("Rating: " + rating);
+            imagesOut.push(p);
+    //        gifDiv.prepend(p)
+            var gifImage = $("<img>");
+            gifImage.attr("src", results[i].images.fixed_height.url);
+      
+
+            var gifImage1 = $("<img>");
+            gifImage1.attr("src", results[i].images.fixed_height_still.url);
+          
+//            gifDiv.prepend(personImage1);
+
+            var stillOrAnimate =$("<img>");
+            stillOrAnimate.attr("src", results[i].images.fixed_height_still.url)
+            stillOrAnimate.attr("data-still", results[i].images.fixed_height_still.url)
+            stillOrAnimate.attr("data-animate", results[i].images.fixed_height.url).attr("data-state","still").attr("class","gif");
+ //             gifDiv.prepend(stillOrAnimate);
+           imagesOut.push(stillOrAnimate);
+
+
+//            $("#gifs-appear-here").prepend(gifDiv);
+
+           }
+
+           for ( var i1 = 0; i1 < imagesOut.length ; i1 ++) {
+                 gifDiv.prepend(imagesOut[i1])
+           }
+           $("#gifs-appear-here").prepend(gifDiv);
+          
+           });
+
+         });
+
+          
+
+
+      
+      // $(".gif").on("click", function() {
+        $(document).on("click",".gif",function() {
+      var animateValue = "animate";
+      var stillValue = "still";
+      var state = ($(this).attr("data-state"))
+      var datastate = ($(this).attr("data-state"))
+      console.log(state)
+      console.log(datastate)
+      if (state == "still")
+       {
+        $(this).attr("src", $(this).data("animate"));
+        $(this).attr("data-state", "animate");
+       }
+       else {
+        $(this).attr("src", $(this).data("still"));
+        $(this).attr("data-state", "still");
+      }
+
+        });
+    // });
+
+     // });
+   
+  
+    
+      
+
+
+  </script>
+</body>
+
+</html>
